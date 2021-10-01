@@ -10,8 +10,10 @@ const UserSchema = new mongoose.Schema(
 			type: Boolean,
 			default: false,
 		},
+		initLoginAt : { type: String, default: ""},
+		currentLoginAt:{ type : String, default: ""}
 	},
-	{ timestamps: true }
+	// { timestamps: true }\
 );
 
 module.exports = mongoose.model("User", UserSchema);

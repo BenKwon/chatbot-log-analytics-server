@@ -2,6 +2,9 @@ const router = require("express").Router();
 const User = require("../models/User");
 const CryptoJS = require("crypto-js");
 const fs = require("fs");
+var moment = require('moment');
+require('moment-timezone');
+moment.tz.setDefault("Asia/Seoul");
 
 router.get("/login", (req,res,next)=>{
     if(req.session.user === undefined){
@@ -66,6 +69,15 @@ router.post("/login", async (req, res) => {
                     return res.status(500).send("error");
                 }
             })
+
+
+            const time = moment().format('YYYY-MM-DD HH:mm:ss');
+            if(!user.initLoginAt && user.initLoginAt === ""){
+                console.log("hi son");
+                await User.updateOne({ userid : user.userid}, { $set : {initLoginAt :time }});
+            }
+            await User.updateOne({ userid : user.userid}, { $set : {currentLoginAt :time }});
+            console.log()
             let {password , ...others} = user._doc;
             others.msg = "로그인 성공";
             res.send(others);

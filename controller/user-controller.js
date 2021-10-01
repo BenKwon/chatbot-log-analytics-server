@@ -1,14 +1,29 @@
 const UserService = require("../service/user-service");
-// exports.getUser = async (req, res, next) => {
+
+
+//GET ALL USERS
+exports.getUsers = async (req, res, next) => {
+    const result = await UserService.getUsers();
+    res.json(result);
+};
+
+//DELETE USERS (MORE THAN OR EQUAL ONE USER)
+exports.deleteUsers = async (req, res, next) => {
+    console.log("body",req.body);
+    const result = await UserService.deleteUsers(req.body.checkedUsers);
+    res.json(result);
+};
+
+//UPDATE USER INFO
+exports.patchUser = async (req, res, next)=>{
+    const result = await UserService.patchUser(req.body);
+    res.json(result);
+}
+
 //     const result = await UserService.getUser(req.params.id);
 //     console.log(result);
 //     res.json(result);
 // };
-
-exports.getUsers = async (req, res, next) => {
-    const result = await UserService.getUsers(req.params.id);
-    res.json(result);
-};
 
 // exports.postUser = async (req, res, next) => {
 //     const user = {

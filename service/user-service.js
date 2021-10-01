@@ -1,23 +1,31 @@
 const User = require("../models/User");
-
-exports.getUser = async (id) => {
-    const [user, fields] = await pool.query("SELECT * FROM users WHERE id = ?", [
-        id,
-    ]);
-    return user;
-};
-
+const CryptoJS = require("crypto-js");
 exports.getUsers = async () => {
     const userList = await User.find().select("-password");
     return userList;
 };
 
-exports.postUser = async (user) => {
-    const [results, fields] = await pool.query(
-        "INSERT INTO users(name,age,married) values (? , ?  , ?)",
-        [user.name, user.age, user.married]
-    );
-    user.id = results.insertId;
-    console.log(user);
-    return user;
+exports.deleteUsers = async (useridList) => {
+    const userList = await User.deleteMany({
+            userid: {$in: useridList},
+        },
+        function (err, rowsToDelete) {
+            if (!err) {
+                return rowsToDelete;
+            } else {
+                return err;
+                console.log('Error in batch delete :' + err);
+            }
+        },);
+    return userList;
+};
+
+exports.patchUser = async (user) => {
+    user.password =  CryptoJS.AES.encrypt(
+        user.password,
+        process.env.PASS_SEC
+    ).toString();
+    const result =  await User.update({userid: user.userid},{ $set : user });
+    console.log(result);
+    return result;
 };

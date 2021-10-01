@@ -24,6 +24,7 @@ router.get("/register", (req,res,next)=>{
 
 //REGISTER
 router.post("/register", async (req, res) => {
+    console.log("req body :  " , req.body);
     const newUser = new User({
         userid :  req.body.userid,
         username: req.body.username,

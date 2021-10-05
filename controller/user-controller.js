@@ -3,7 +3,8 @@ const UserService = require("../service/user-service");
 
 //GET ALL USERS
 exports.getUsers = async (req, res, next) => {
-    const result = await UserService.getUsers();
+    console.log("page : ",req.query.page);
+    const result = await UserService.getUsers(req.query.page);
     res.json(result);
 };
 

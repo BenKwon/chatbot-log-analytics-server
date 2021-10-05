@@ -1,7 +1,11 @@
 const User = require("../models/User");
 const CryptoJS = require("crypto-js");
-exports.getUsers = async () => {
-    const userList = await User.find().select("-password");
+exports.getUsers = async (page) => {
+    if(!page) page = 1;
+    let skip = (page - 1) * 10;
+    let limit = 10;
+    // const userList = await User.find().sort({"userid" : 1});
+    const userList = await User.find().skip(skip).limit(limit).select("-password");
     return userList;
 };
 

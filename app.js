@@ -35,12 +35,13 @@ app.use(morgan('combined'));
 //IMPORT ROUTERS
 const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user-router");
-
+const loginLogRouter = require("./routes/loginLog-router");
 app.get("/", (req,res)=>{
     res.send("success");
 })
 app.use("/auth", authRouter);
 app.use("/user", userRouter);
+app.use("/loginLog", loginLogRouter);
 app.listen(app.get("port"), () => {
     console.log(app.get("port"), "번 포트에서 대기 중");
 });

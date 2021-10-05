@@ -1,6 +1,12 @@
 const UserService = require("../service/user-service");
 
 
+//GET ALL USERS COUNT
+exports.getUsersCount = async (req, res, next) => {
+    const result = await UserService.getUsersCount();
+    res.json(result);
+};
+
 //GET ALL USERS
 exports.getUsers = async (req, res, next) => {
     console.log("page : ",req.query.page);

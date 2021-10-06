@@ -5,7 +5,6 @@ const router = express.Router();
 // router.get("/:id", UserController.getUser);
 router.post("/", (req,res,next)=>{
     const authHeader = req.headers.token;
-    console.log(authHeader);
     if (authHeader) {
         //type Bearer
         const token = authHeader.split(" ")[1];
@@ -18,7 +17,7 @@ router.post("/", (req,res,next)=>{
                     "pass" : false,
                     "msg" : "Token is not valid"
                 }
-                res.status(403).json(result);
+                res.status(201).json(result);
             }
             else {
                 req.user = user;
@@ -31,7 +30,12 @@ router.post("/", (req,res,next)=>{
             }
         });
     } else {
-        return res.status(401).json("You are not authenticated");
+        result = {
+            "result" : "fail",
+            "msg" : "You are not authenticated",
+            "pass" : false
+        };
+        return res.status(201).json(result);
     }
 });
 

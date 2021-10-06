@@ -15,13 +15,14 @@ exports.getLogs = async (query) => {
         console.log(end);
         let logs,count;
         if (!query.keywordType) {
-            count = await LoginLog.find({
+            console.log("============no keyword");
+            count = (await LoginLog.find({
                 $and:
                     [
                         {"loginAt": {"$gte": start}},
                         {"loginAt": {"$lte": end}}
                     ]
-            }).estimatedDocumentCount();
+            })).length;
             logs = await LoginLog.find({
                 $and:
                     [
@@ -32,14 +33,14 @@ exports.getLogs = async (query) => {
         } else {
             const keyword = query.keyword;
             if (query.keywordType == "name") {
-                count = await LoginLog.find({
+                count = (await LoginLog.find({
                     $and:
                         [
                             {"loginAt": {"$gte": start}},
                             {"loginAt": {"$lte": end}},
                             {"username": keyword}
                         ]
-                }).estimatedDocumentCount();
+                })).length;
                 logs = await LoginLog.find({
                     $and:
                         [
@@ -49,14 +50,14 @@ exports.getLogs = async (query) => {
                         ]
                 }).skip(skip).limit(limit);
             } else {
-                count = await LoginLog.find({
+                count = (await LoginLog.find({
                     $and:
                         [
                             {"loginAt": {"$gte": start}},
                             {"loginAt": {"$lte": end}},
                             {"userid": keyword}
                         ]
-                }).estimatedDocumentCount();
+                })).length;
                 logs = await LoginLog.find({
                     $and:
                         [

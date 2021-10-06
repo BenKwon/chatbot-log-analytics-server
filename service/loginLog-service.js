@@ -12,7 +12,7 @@ exports.getLogs = async (query) => {
         let end = new Date(query.endDate);
         end.setDate(end.getDate() + 1);
         end = moment(end).format('YYYY-MM-DD');
-        let logs;
+        let logs,count;
         if (!query.keywordType) {
             logs = await LoginLog.find({
                 $and:
@@ -43,6 +43,8 @@ exports.getLogs = async (query) => {
                 }).skip(skip).limit(limit);
             }
         }
+        logs = {"data" : logs, "count": logs.length};
+        console.log("he", logs);
         return logs;
     } catch (err) {
         console.log(err);

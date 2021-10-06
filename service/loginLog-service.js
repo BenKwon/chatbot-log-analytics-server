@@ -12,8 +12,16 @@ exports.getLogs = async (query) => {
         let end = new Date(query.endDate);
         end.setDate(end.getDate() + 1);
         end = moment(end).format('YYYY-MM-DD');
+        console.log(end);
         let logs,count;
         if (!query.keywordType) {
+            count = await LoginLog.find({
+                $and:
+                    [
+                        {"loginAt": {"$gte": start}},
+                        {"loginAt": {"$lte": end}}
+                    ]
+            }).estimatedDocumentCount();
             logs = await LoginLog.find({
                 $and:
                     [
@@ -24,6 +32,14 @@ exports.getLogs = async (query) => {
         } else {
             const keyword = query.keyword;
             if (query.keywordType == "name") {
+                count = await LoginLog.find({
+                    $and:
+                        [
+                            {"loginAt": {"$gte": start}},
+                            {"loginAt": {"$lte": end}},
+                            {"username": keyword}
+                        ]
+                }).estimatedDocumentCount();
                 logs = await LoginLog.find({
                     $and:
                         [
@@ -33,6 +49,14 @@ exports.getLogs = async (query) => {
                         ]
                 }).skip(skip).limit(limit);
             } else {
+                count = await LoginLog.find({
+                    $and:
+                        [
+                            {"loginAt": {"$gte": start}},
+                            {"loginAt": {"$lte": end}},
+                            {"userid": keyword}
+                        ]
+                }).estimatedDocumentCount();
                 logs = await LoginLog.find({
                     $and:
                         [
@@ -43,8 +67,7 @@ exports.getLogs = async (query) => {
                 }).skip(skip).limit(limit);
             }
         }
-        logs = {"data" : logs, "count": logs.length};
-        console.log("he", logs);
+        logs = {"data" : logs, count};
         return logs;
     } catch (err) {
         console.log(err);

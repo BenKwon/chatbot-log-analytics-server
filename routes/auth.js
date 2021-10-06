@@ -58,7 +58,8 @@ router.post("/login", async (req, res) => {
                 "userid": user.userid,
                 "username": user.username,
                 "ip": ip,
-                "loginAt": time
+                "loginAt": time,
+                "department": user.department
             });
             const newLog = await newLoginLog.save();
             console.log(newLog);

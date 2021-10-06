@@ -5,7 +5,8 @@ const LoginLogSchema = new mongoose.Schema(
         userid: { type: String, required: true },
         username: { type: String, required: true },
         ip : { type: String},
-        loginAt:{ type : String, default: ""}
+        loginAt:{ type : String, default: ""},
+        department:{type : String, default: ""}
     }
     // { timestamps: true }\
 );

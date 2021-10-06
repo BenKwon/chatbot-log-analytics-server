@@ -2,6 +2,7 @@ const CryptoJS = require("crypto-js");
 const LoginLog = require("../models/LoginLog");
 const moment = require("moment");
 const User = require("../models/User");
+moment.tz.setDefault("Asia/Seoul");
 
 exports.getLogs = async (query) => {
     try {
@@ -15,7 +16,6 @@ exports.getLogs = async (query) => {
         console.log(end);
         let logs,count;
         if (!query.keywordType) {
-            console.log("============no keyword");
             count = (await LoginLog.find({
                 $and:
                     [
@@ -32,6 +32,7 @@ exports.getLogs = async (query) => {
             }).skip(skip).limit(limit);
         } else {
             const keyword = query.keyword;
+            console.log(query.keywordType);
             if (query.keywordType == "name") {
                 count = (await LoginLog.find({
                     $and:

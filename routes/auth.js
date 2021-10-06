@@ -3,33 +3,38 @@ const User = require("../models/User");
 const LoginLog = require("../models/LoginLog");
 const CryptoJS = require("crypto-js");
 const fs = require("fs");
+const jwt = require("jsonwebtoken");
 var moment = require('moment');
 require('moment-timezone');
 moment.tz.setDefault("Asia/Seoul");
 
-router.get("/login", (req, res, next) => {
-    if (req.session.user === undefined) {
-        fs.readFile('./public/login.html', (err, data) => {
-            res.end(data);
-        });
-    } else {
-        res.send(req.session.user.id);
-    }
-
-});
+// router.get("/login", (req, res, next) => {
+//     if (req.session.user === undefined) {
+//         fs.readFile('./public/login.html', (err, data) => {
+//             res.end(data);
+//         });
+//     } else {
+//         res.send(req.session.user.id);
+//     }
+//
+// });
 
 //LOGIN
 
 router.post("/login", async (req, res) => {
     try {
+        console.log("==========================================================================");
+        //ip가져오기
         const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         let user = await User.findOne({userid: req.body.userid});
+        //해당 유저가 없는 경우
         if (user === null) {
             res
                 .json("There is no user whose name is " + req.body.userid);
             return;
         }
 
+        //DB에서 가져온 이용자 패스워드 암호화 해제
         const decrypted = CryptoJS.AES.decrypt(user.password, process.env.PASS_SEC);
         const originPass = decrypted.toString(CryptoJS.enc.Utf8);
         //Failed to Login
@@ -38,14 +43,18 @@ router.post("/login", async (req, res) => {
             res.status(401).json("Wrong Credentials");
         } else {//Success Login
             //세션 을 활용해서 로그인 처리하기
-            req.session.user = user;
-            req.session.save(err => {
-                if (err) {
-                    console.log(err);
-                    throw err;
-                }
-            })
+            // req.session.user = user;
+            // req.session.save(err => {
+            //     if (err) {
+            //         console.log(err);
+            //         throw err;
+            //     }
+            // })
 
+            /**
+             *  JWT를 이용해서 로그인 처리하기
+             */
+            console.log("user123123",user);
 
             const time = moment().format('YYYY-MM-DD HH:mm:ss');
             if (!user.initLoginAt && user.initLoginAt === "") {
@@ -65,18 +74,23 @@ router.post("/login", async (req, res) => {
             console.log(newLog);
             let {password, ...others} = user._doc;
             others.msg = "로그인 성공";
-            res.status(200).send(others);
+            console.log("user",user);
+            const accessToken = jwt.sign({
+                id: user._id,
+                isAdmin: user.isAdmin,
+            },process.env.JWT_SEC,{expiresIn: "1d"});
+            res.status(200).json({others, accessToken});
         }
     } catch (err) {
         res.status(500).json(err);
     }
 });
 
-router.get("/register", (req, res, next) => {
-    fs.readFile('./public/register.html', (err, data) => {
-        res.end(data);
-    });
-});
+// router.get("/register", (req, res, next) => {
+//     fs.readFile('./public/register.html', (err, data) => {
+//         res.end(data);
+//     });
+// });
 
 //REGISTER
 router.post("/register", async (req, res) => {

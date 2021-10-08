@@ -6,7 +6,7 @@ const PriorityQueue = require("js-priority-queue");
  * @returns
  * {
  *   keys : [id1, id2, id3 ...],
- *   id1 : [Object],
+ *   id1 : [Object], // Content Object
  *   id2 : [Object],
  *   id3 : [Object],
  *   ....
@@ -41,7 +41,8 @@ exports.getDialogs = async (dialogSessionId) => {
         };
         //데이터 가공
         let making = {
-            "keys" : []
+            "keys" : [],
+            "data" : []
         };
         for(let i = 0 ; i < contents.length;  i++){
             let content = contents[i];
@@ -63,9 +64,18 @@ exports.getDialogs = async (dialogSessionId) => {
                 making[key].push(poll);
             }
         });
-
-
-        return making;
+        for(let i = 0 ; i < making.keys.length ; i++){
+            let tmp = [];
+            for(let j = 0 ; j < making[making.keys[i]].length ; j++){
+                tmp.push(making[making.keys[i]][j]);
+            }
+            making.data.push(tmp);
+        }
+        result = {
+            "keys" : making.keys,
+            "data" : making.data
+        };
+        return result;
     }catch (err){
         console.log(err)
     }

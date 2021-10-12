@@ -17,7 +17,7 @@ const moment = require("moment");
  */
 exports.getDialogs = async (dialogSessionId) => {
     try{
-        let result = await axios.get(process.env.API_URL,
+        let result = await axios.get(`${process.env.API_URL}/search`,
             {
                 params : {
                     "dialog-session-id" : dialogSessionId
@@ -87,3 +87,31 @@ exports.getDialogs = async (dialogSessionId) => {
         // return err;
     }
 };
+
+exports.getCurrentCount = async () => {
+    const start = moment().add(-7,'d').format("YYYY-MM-DD");
+    const end = moment().add(-1 , 'd').format("YYYY-MM-DD");
+    try{
+        const result = await axios.get(`${process.env.API_URL}/trend/dialog-session-id/${start}~${end}`,
+            {
+                headers : {
+                    "CONAN-ACCESS-KEY" : process.env.API_ACCESS_KEY
+                }
+            }
+        );
+        return result;
+    }catch(error){
+        console.log(error);
+    }
+    // console.log(moment(time).add(-1,'d'));
+}
+
+exports.getIdByCondition = async (params)=>{
+    const result = await axios.get(`${process.env.API_URL}/search`,{
+        headers : {
+            "CONAN-ACCESS-KEY" : process.env.API_ACCESS_KEY
+        },
+        params
+    });
+    return result;
+}

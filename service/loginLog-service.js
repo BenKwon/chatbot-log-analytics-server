@@ -1,7 +1,7 @@
 const CryptoJS = require("crypto-js");
 const LoginLog = require("../models/LoginLog");
-const moment = require("moment");
 const User = require("../models/User");
+const moment = require("moment");
 moment.tz.setDefault("Asia/Seoul");
 
 exports.getLogs = async (query) => {

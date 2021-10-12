@@ -1,6 +1,5 @@
 const axios = require("axios");
 const PriorityQueue = require("js-priority-queue");
-const moment = require("moment");
 /*
  * @param dialogSessionId
  * @returns {Promise<{keys: *[]}>}
@@ -47,7 +46,7 @@ exports.getDialogs = async (dialogSessionId) => {
         for(let i = 0 ; i < contents.length;  i++){
             let content = contents[i];
             if(!map.get(content.DialogTransactionID)){
-                making[content.DialogTransactionID] = [];
+                making[content.DialogTransactionID] = []
                 making.keys.push(content.DialogTransactionID);
                 map.set(content.DialogTransactionID,
                     newPQ()
@@ -61,9 +60,6 @@ exports.getDialogs = async (dialogSessionId) => {
             let pq = value;
             while(pq.length > 0){
                 let poll = pq.dequeue();
-                if(poll.Entities != null){
-                    poll.Entities = poll.Entities.filter(entity=> entity.ID.split("-")[0] === "CE");
-                }
                 making[key].push(poll);
             }
         });
@@ -76,14 +72,11 @@ exports.getDialogs = async (dialogSessionId) => {
         }
         result = {
             "size" : result.data.Size,
-            "LoginAccessFrom" : result.data.LoginAccessFrom,
             "keys" : making.keys,
             "data" : making.data,
         };
         return result;
-    }catch (error){
-        console.log(error.response.data);
-        return error.response.data;
-        // return err;
+    }catch (err){
+        console.log(err)
     }
 };

@@ -28,3 +28,7 @@ exports.getIdByCondition = async function(req, res ,next){
         console.log(error);
     }
 }
+exports.getTopSearched = async function (req, res, next) {
+    const result =await searchService.getTopSearched();
+    res.status(201).json(result);
+};

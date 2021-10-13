@@ -2,6 +2,7 @@ const axios = require("axios");
 const PriorityQueue = require("js-priority-queue");
 const moment = require("moment");
 const searchKeyword = require("../models/searchKeyword");
+const LoginLog = require("../models/LoginLog");
 /*
  * @param dialogSessionId
  * @returns {Promise<{keys: *[]}>}
@@ -158,4 +159,103 @@ exports.getIdByCondition = async (params)=>{
     }
 
     console.log("data --------------",result.data);
+}
+/**
+ * 최근 7일 데이터이여야 한다.
+ * 인테트 타입별로 나누어애 한다.
+ * 객체를 이용해서 타입별로 나누어진 결과에서 각 검색어별 갯수를 구한다*
+ * 인텐트 타입별로 나누어서 나온 3가지의 검색어별 갯수를 합쳐서 내림차순한다.
+ * @returns {Promise<void>}
+ */
+exports.getTopSearched = async ()=>{
+    let start = new Date();
+    start.setDate(start.getDate() - 7);
+    let end = new Date();
+    end.setDate(end.getDate() + 1);
+    start = moment(start).format('YYYY-MM-DD');
+    end = moment(end).format('YYYY-MM-DD');
+
+    const intentPatternResult = await searchKeyword.find({
+        $and:
+            [
+                {"searchedAt": {"$gte": start}},
+                {"searchedAt": {"$lte": end}},
+                {"type" : "intent-pattern"}
+            ]
+    });
+    const intentResult = await searchKeyword.find({
+        $and:
+            [
+                {"searchedAt": {"$gte": start}},
+                {"searchedAt": {"$lte": end}},
+                {"type" : "intent"}
+            ]
+    });
+    const entityResult = await searchKeyword.find({
+        $and:
+            [
+                {"searchedAt": {"$gte": start}},
+                {"searchedAt": {"$lte": end}},
+                {"type" : "entity"}
+            ]
+    });
+    //인텐트 패턴
+    let intentPatternTmp = {};
+    for(let i = 0 ; i < intentPatternResult.length; i++){
+        const result = intentPatternResult[i];
+        if(intentPatternTmp[result.keyword]) intentPatternTmp[result.keyword]++;
+        else intentPatternTmp[result.keyword] = 1;
+    }
+    let intentPattern = [];
+    for (const [key, value] of Object.entries(intentPatternTmp)) {
+        intentPattern.push({
+            type : "intent-pattern",
+            key,
+            value
+        })
+    }
+
+    //인텐트
+    let intentTmp = {};
+    for(let i = 0 ; i < intentResult.length; i++){
+        const result = intentResult[i];
+        if(intentTmp[result.keyword]) intentTmp[result.keyword]++;
+        else intentTmp[result.keyword] = 1;
+    }
+    let intent = [];
+    for (const [key, value] of Object.entries(intentTmp)) {
+        intent.push({
+            type : "intent",
+            key,
+            value
+        })
+    }
+
+
+    //엔티티
+    let entityTmp = {};
+    for(let i = 0 ; i < entityResult.length; i++){
+        const result = entityResult[i];
+        if(entityTmp[result.keyword]) entityTmp[result.keyword]++;
+        else entityTmp[result.keyword] = 1;
+    }
+    let entity = [];
+    for (const [key, value] of Object.entries(entityTmp)) {
+        entity.push({
+            type : "entity",
+            key,
+            value
+        })
+    }
+
+    let result = [
+        ...intentPattern,
+        ...intent,
+        ...entity
+    ]
+    result.sort(function (o1, o2) {
+        return o2.value - o1.value;
+    });
+    return result;
+    // console.log(entityResult);
 }

@@ -1,6 +1,7 @@
 const axios = require("axios");
 const PriorityQueue = require("js-priority-queue");
 const moment = require("moment");
+const searchKeyword = require("../models/searchKeyword");
 /*
  * @param dialogSessionId
  * @returns {Promise<{keys: *[]}>}
@@ -106,12 +107,55 @@ exports.getCurrentCount = async () => {
     // console.log(moment(time).add(-1,'d'));
 }
 
+//키워드 탭에서 검색
 exports.getIdByCondition = async (params)=>{
-    const result = await axios.get(`${process.env.API_URL}/search`,{
-        headers : {
-            "CONAN-ACCESS-KEY" : process.env.API_ACCESS_KEY
-        },
-        params
-    });
-    return result;
+    console.log(params);
+    const time = moment().format('YYYY-MM-DD HH:mm:ss');
+    if(params['intent-pattern']){ // delimiter -
+        const pattern = params['intent-pattern'].split('-');
+        for (let i = 0; i < pattern.length; i++) {
+            if(pattern[i] != "*"){
+                new searchKeyword({
+                    "keyword" : pattern[i],
+                    "type": "intent-pattern",
+                    "searchedAt" : time
+                }).save()
+            }
+        }
+    }
+    if(params.intent){ // delimiter ,
+        const intent = params.intent.split('-');
+        for (let i = 0; i < intent.length; i++) {
+            new searchKeyword({
+                "keyword" : intent[i],
+                "type": "intent",
+                "searchedAt" : time
+            }).save()
+        }
+    }
+    if(params.entity){ //delimiter
+        const entity = params.entity.split('-');
+        for (let i = 0; i < entity.length; i++) {
+            await new searchKeyword({
+                "keyword" : entity[i],
+                "type": "entity",
+                "searchedAt" : time
+            }).save()
+        }
+    }
+    try{
+        const result = await axios.get(`${process.env.API_URL}/search`,{
+            headers : {
+                "CONAN-ACCESS-KEY" : process.env.API_ACCESS_KEY
+            },
+            params: params
+        });
+        console.log("result",result.data);
+        return result;
+    }catch(err){
+        console.log("에러발생",err);
+        return err;
+    }
+
+    console.log("data --------------",result.data);
 }

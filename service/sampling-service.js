@@ -39,9 +39,9 @@ exports.getRecentIntents = async (date) => {
         o1.TotalCount = TotalCount;
         return o1;
     })
-    // tmp.sort(function(o1,o2){
-    //     return o2.IncreaseRate -o1.IncreaseRate;
-    // })
+    tmp.sort(function(o1,o2){
+        return o2.TotalCount -o1.TotalCount;
+    })
     return tmp;
     // return result.data;
 }

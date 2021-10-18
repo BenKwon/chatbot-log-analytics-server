@@ -38,6 +38,7 @@ const userRouter = require("./routes/user-router");
 const loginLogRouter = require("./routes/loginLog-router");
 const verifyTokenRouter = require("./routes/verifyToken");
 const searchRouter = require("./routes/search-router");
+const samplingRouter = require("./routes/sampling-router");
 app.get("/", (req,res)=>{
     res.send("success");
 })
@@ -46,7 +47,7 @@ app.use("/user", userRouter);
 app.use("/loginLog", loginLogRouter);
 app.use("/verifyToken", verifyTokenRouter);
 app.use("/search", searchRouter);
-
+app.use("/sampling", samplingRouter);
 app.listen(app.get("port"), () => {
     console.log(app.get("port"), "번 포트에서 대기 중");
 });

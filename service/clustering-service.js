@@ -7,6 +7,6 @@ exports.getClustering = async (query)=>{
         headers : {
             "CONAN-ACCESS-KEY" : process.env.API_ACCESS_KEY
         }
-    })
+    });
     return result.data;
 }

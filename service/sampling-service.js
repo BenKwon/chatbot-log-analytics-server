@@ -43,5 +43,4 @@ exports.getRecentIntents = async (date) => {
         return o2.TotalCount -o1.TotalCount;
     })
     return tmp;
-    // return result.data;
 }
